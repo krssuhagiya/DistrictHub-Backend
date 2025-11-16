@@ -14,9 +14,12 @@ const morgan = require("morgan");
 app.use(express.json());
 app.use(express.urlencoded({extended:true})); 
 connectToDB();
-const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173").split(",").map(s => s.trim());
 app.use(cors({
-  origin: allowedOrigin,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    callback(null, allowedOrigins.includes(origin));
+  },
   methods: "GET,POST,PUT,DELETE",
   credentials: true,
 }));
